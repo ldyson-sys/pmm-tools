@@ -1,7 +1,7 @@
 # Maximizer Demo Engine — Handoff
-Updated: 2026-09-08 · Session: Claude Code
+Updated: 2026-10-21 · Session: Claude Code
 
-## 2026-09-28 session (Continuum webinar prep - Halloran story, IN PROGRESS)
+## 2026-09-28 session (Continuum webinar prep - Halloran story, DATA COMPLETE for Oct 1)
 - Webinar partner is now **Continuum**, not Focal (script: Downloads/
   "Continuum x Maximizer Webinar Script.docx", presenters Elena + Alex).
   FSE PAT renewed today (next expiry ~Oct 28).
@@ -46,6 +46,41 @@ Updated: 2026-09-08 · Session: Claude Code
   halloran.family@mail.test. Group-benefits company questionnaire left
   blank on purpose (households are Company-typed; filled answers look fake).
   [verify] which advisor field the UI labels "Advisor".
+- All commits through 4a6d79b are on origin/main (checked 2026-10-21).
+- Halloran timeline at close, in order: 2024-08 RESP allocation note +
+  OPEN task "Revisit RESP allocation when Maya gets close to university";
+  2026-03-18 thin note; 2026-05-08 spring review; 2026-06-12 Priya cottage
+  call; 2026-09-28 RESP statement note. Nothing else.
+
+## 2026-09-23 session (the skill itself: refresh upgrade + open to teammates)
+- **refresh-story.py now also rolls Next KYC Review**
+  (`Udf/$TAG(WME_CLIENTINFO_REV_NEXTKYC)`) **and Opportunity CloseDate**,
+  same gap-preserving shift, and warns when either crosses into next
+  calendar year (FA Intelligence tiles drop it). Date-only values shift
+  as plain dates. NOT rolled: Last KYC Review (no validated tag),
+  Opportunity StartDate, Business+ manifests (path not wired).
+  Opportunity CloseDate Update via API is UNTESTED live [verify on first
+  real refresh; read-back will flag it].
+- **Bug fixed:** an expired PAT returns HTTP 200 + `Code -2`
+  (ErrorCode -20003). The old script read that as "record not found" and a
+  dry run hid failures, so it reported a clean no-op. `call()` now exits
+  with a renew-the-PAT message; dry runs print planning problems.
+- **Skill opened to teammates:** the "Phase 1: Lewis only" line in
+  SKILL.md is replaced by own-clone + own-PAT + shared-tenant checks
+  (ask who else is recording; never clean up someone else's story).
+  SKILL.md and CLAUDE.md now address "the user", not Lewis; Lewis stays
+  named only where the fact is his (his Mac's Python 3.9, LDYSON account,
+  Sokolov ownership, Bill Graham sign-off). Rule 10 widened to "no real
+  staff names in demo data" (a teammate's PAT leaks their name the same
+  way via note/Creator stamps).
+- **claude.ai skill re-uploaded** (Lewis's Chrome, his OK): now v3 with
+  the teammate wording. Upload path: claude.ai > Customize > Skills >
+  Add > Upload skill; same name triggers "Upload and replace", prior
+  versions kept in history.
+- Sharing via GitHub: instructions given (private repo, invite
+  collaborators, folder link, Claude Code install = clone + copy skill to
+  ~/.claude/skills/ + own .env). Recommended a separate private
+  demo-engine repo under a Maximizer org. NOT done [verify].
 
 ## 2026-09-08 session (IQ Boost Q3 came back weak — phrasing, or data shape)
 - **Q3 test result (Lewis ran it in the UI, pasted the answer).** Asked
@@ -467,13 +502,45 @@ and ~95% complete.
 - **Phased rollout agreed with Lewis:** P1 engine core (Lewis only) → P2
   nightly refresh + story library → P3 enablement (Mark) → P4 sales
   self-serve (gated on demand) → P5 recording-analysis loop.
+- **2026-09-23: Lewis-only gate lifted.** Teammates may drive the skill
+  from their own clone with their own PAT. Refresh stays ON DEMAND (P2
+  nightly refresh still not built). Rejected for now: a scheduled
+  book-wide roll, because it would also age stories whose staleness IS
+  the aha (See Your Whole Book's five quiet households).
+- **2026-09-28: never run refresh-story.py on webinar-mcgill-catch.** The
+  Continuum script quotes absolute months ("scroll back to March",
+  "Priya brought it up in June"); a relative roll breaks both lines.
+  Bring that story current by ADDING records, not shifting them.
+- **2026-09-28: Focal summary note deleted, not rebranded.** Two
+  "today's meeting" summaries would collide with Continuum's live push.
+  Rejected: a Continuum-branded backup note; only add one if a dry run
+  shows the push failing.
+- **2026-09-28: group-benefits company questionnaire left blank on
+  households.** Households are Company-typed so the form shows; filled
+  answers ("# of Employees") look fake on a family. Rejected: filling it.
+  Fix is an admin layout change to hide the section on households.
 
 ## Open items & blockers
-- **IQ Boost Q1 and Q2 results never reported.** Q2 is the diagnostic
-  that decides whether the Q3 fix is phrasing or data (see 2026-09-08).
-  Run Q2 first; do not enrich anything until it comes back.
-- **Focal note still dated 2026-08-17, not Aug 19** (verified 2026-09-08).
-  Either the nudge was skipped or the webinar ran with it dated the 17th.
+- **FSE PAT expires ~2026-10-28** (renewed 2026-09-28, 30-day life).
+  Renewal: Lewis creates it in Maximizer user preferences as LDYSON, then
+  in the repo root runs `read -s "PAT?Paste the token, then press
+  Return: " && printf 'MAXIMIZER_PAT=%s\n' "$PAT" > .env && unset PAT`.
+  Never paste it in chat.
+- **Oct 1 Continuum webinar: outcome unknown** [verify]. Unconfirmed:
+  whether IQ Boost cited the Sep 28 RESP note (not March), whether the
+  manual items got done (sample page in Documents, dealer accounts, real
+  email), whether Continuum mapped the TFSA task to a female associate.
+- **Halloran dates are now past/imminent:** Next KYC Review 2026-10-15
+  (overdue), Next Portfolio Review 2026-10-22. If the story is reused,
+  re-date these deliberately (not via refresh-story.py, see Decisions).
+- **"Advisor" label** on the household screen: Primary Advisor
+  `$TYPEID(437)` = B. Smith is set; if the UI shows the other enum
+  `$TYPEID(1178)` (Candace/John only) it reads blank, and adding Barb
+  there is admin-only [verify with Lewis].
+- **Persona users (Adam, Ingrid) still do not exist**, so Creator/note
+  stamps leak whoever's PAT ran the seeder. Blocks clean teammate use.
+- ~~IQ Boost Q2 diagnostic / Focal note date~~ SUPERSEDED 2026-09-28: the
+  Focal note is deleted and the webinar moved to Continuum.
 - **Handoff rename uncommitted before this session:** the Aug 28 Cowork
   session renamed 08-17 → 08-28 but the mount hides `.git`, so it sat
   unstaged. Folded into this session's commit.
@@ -496,6 +563,13 @@ and ~95% complete.
 - `.env` not yet created at repo root; nothing committed yet this session.
 
 ## Next steps (in order)
+0. (2026-10-21) Ask Lewis how the Oct 1 webinar went and whether the
+   Halloran story is retired or reused; then renew the PAT before
+   ~Oct 28 if any tenant work is coming.
+0b. Decide the GitHub sharing route (private repo + invites, or a
+   separate demo-engine repo) before sending teammates a link.
+0c. This handoff is ~700 lines (target 150). Offer Lewis an archive pass:
+   move pre-September session logs to docs/handoff-archive-*.md.
 ~~1-3 DONE 2026-07-15 (later session):~~ RESP task created & verified
 (key VGFzawk0Nzg=, due +7d, in manifest); manifest moved to `manifests/`
 and both scripts updated (Desktop copy is a stale spare — delete after
@@ -544,6 +618,20 @@ Commit/push still pending Lewis's go-ahead.
 - Repo lives at `~/Claude Code/demo-engine` — NOT `~/Desktop/Claude Code`,
   which is a different folder with no demo-engine in it.
 - PAT is demo-tenant only, lives in `.env`, never in chat or commits.
+- Expired PAT = HTTP 200 with `Code -2` / ErrorCode -20003, not an HTTP
+  error. Check `Code` on every response.
+- New field facts (2026-09-28, all in CLAUDE.md): currency UDFs take a
+  NUMBER; Note has `RichText` (what the UI renders, one `<div>` per line)
+  beside plain `Text`; Email write = nested `Email1` object; several
+  planning UDFs are person-level only; some text UDFs cap at 29 chars and
+  an over-length value fails the WHOLE Update.
+- Files in OneDrive (`~/Library/CloudStorage/OneDrive-*`) are blocked to
+  Bash by macOS ("Operation not permitted", even unsandboxed). Ask Lewis
+  for a copy in Downloads.
+- The Maximizer MCP servers named above disconnected on 2026-10-21. A
+  different Maximizer MCP server now lists `document_create`,
+  `household_read`, `timeline_read`; if it targets FSE it may unblock the
+  manual "page in Documents" step [verify which tenant before any write].
 
 ## Session preferences
 - Lewis wants step-by-step, zero-knowledge instructions for anything
