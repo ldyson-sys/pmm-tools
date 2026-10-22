@@ -38,6 +38,12 @@ FINGERPRINTS = {
         "must_have": ["Cameron"],
         "must_not_have": ["Peter and Mary Cameron Family"],
     },
+    # French FSE (MarketingFSPlusFrench), first contact 2026-10-21: NOT a clone
+    # (0 shared record keys with FSE), but same field IDs with French labels.
+    "fse-fr": {
+        "must_have": ["Famille Dubois-Lefebvre"],
+        "must_not_have": ["Cameron", "Peter and Mary Cameron Family"],
+    },
 }
 
 

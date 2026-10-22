@@ -134,8 +134,18 @@
                               <!--                                                             -->
                               <!-- [C] Screenshot image table (omit if no image available)   -->
                               <!-- <table ...><tr><td style="padding:2px 10px;" align="center">-->
-                              <!--   <img src="[URL]" width="600" ...>                        -->
+                              <!--   <img src="[URL]" width="[W]"                              -->
+                              <!--        style="width:[W]px;max-width:100%;height:auto;">    -->
                               <!-- </td></tr></table>                                          -->
+                              <!--                                                             -->
+                              <!-- [W] = explicit pixel width. NEVER a bare width:100%.        -->
+                              <!-- W = min(nativeWidth, cap)                                  -->
+                              <!--   landscape/full-app ....... cap 600                        -->
+                              <!--   PORTRAIT (mobile shots) ... cap 340                       -->
+                              <!-- min() also means: never upscale a small asset.              -->
+                              <!-- A portrait phone capture at 600 wide renders 1300px tall    -->
+                              <!-- and swamps the email. Set width attr AND style: Outlook on  -->
+                              <!-- Windows ignores max-width. Centering = td align=center.     -->
                               <!-- ============================================================ -->
 
                               {{FEATURE_BLOCKS}}

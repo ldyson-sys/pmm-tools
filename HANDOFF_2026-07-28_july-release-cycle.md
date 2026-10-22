@@ -1,0 +1,43 @@
+# Maximizer Release Automation — Handoff
+Updated: 2026-08-27 · Session: Claude Code (Lewis's Mac)
+Supersedes: `HANDOFF_2026-06-29_june-release-cycle.md` (kept as history)
+
+## Context
+Monthly workflow that turns a PDF export of the Microsoft Loop release page into a Zendesk release-notes article and a Resend customer email. Project root: `/Users/lewisdyson/Claude Code/`. Workflow spec: `workflows/maximizer_release_automation.md`. Templates + scripts in `resources/`. Per-cycle outputs in `output/YYYY-MM-release/`. This session ran the **July 2026 (M7)** cycle end-to-end from `~/Downloads/2026 M7.pdf`. **The cycle is COMPLETE: article published live and the customer broadcast sent (2026-07-28).**
+
+## Decisions
+- **NEW article title convention (2026-07, Lewis-directed):** `Maximizer Cloud – {Month} {Year}.{Month number}`, e.g. `Maximizer Cloud – July 2026.7`. The old `Maximizer Cloud – June 2026 (2026 M6)` style is retired (pre-July articles keep it). Workflow Step 7a and `release_notes_template.md` rule 17 are updated.
+- **Test send before broadcast (now a standing step):** before Step 7d's broadcast, email the operator a copy from `marketing@maximizer.com` to `lewisdyson@maximizer.com` via `/emails`, subject prefixed `[DRAFT] `, and wait for approval. Written into Step 7d.
+- **Step 6 CS notification is optional:** the CS team is already inside the Release Notes audience, so they get the broadcast itself. Separate review email skipped in July; note added to Step 6.
+- **Headline-feature "What's new" explains the capability, not the mechanics.** Lewis rewrote July's Workflows-for-Leads block to first say what workflows ARE (template = sequence of auto-created follow-up tasks) before "now available for leads". Apply this framing to future headline features; keep click-path detail in the article's How it works.
+- **Edition conflicts: body wins over table (flag it).** July's Loop table said `FSE/FSE+` and `All (IQ Boost)` where the body said `FSE+ / Business+` for the same features. Used the body values (match June's published convention); Lewis reviewed and did not object. Still flag any conflict in the review message.
+- **Image widths are explicit pixels, never `width:100%` (2026-08-27, Lewis-directed):** new **Step 3b** in the workflow measures every raw image with `sips` and computes a display width before assets are generated. The rule is `W = min(nativeWidth, cap)`, cap 600 landscape / **340 portrait** in the email (650 / 400 in the article). Why: a 1170×2532 phone capture at `width:100%` renders 600×1300 and swamps the email — it now lands at 340 (~736 tall). The `min()` carries the never-upscale rule, so July's 322×790 IQ Boost panel still comes out at 322. Rejected a rendered-height-budget formula (`floor(620 × W ÷ H)`) — it was self-adjusting but would have *shrunk* that 322px panel to 252, contradicting the July decision; a flat cap matches precedent and is easier to eyeball. The width goes in **both** the `width` attribute and the inline style because Outlook on Windows (Word engine) ignores `max-width`. Generalized from July's ad-hoc "narrow images capped at native width" call. Applies to the Zendesk article too — same failure mode, wider column. Step 7c now fails the check on a bare `width:100%`, a portrait image over ~620px tall, or any upscale.
+- **Fixed a spec contradiction while in there:** Asset 2's image rules said "associated to features by DOM order (`01.png`, `02.png`, …)", which contradicted the locked "map by section position, never by raw index" rule. Asset 2 now points at the same section-position mapping as Asset 1.
+- **Email images: no visible caption lines** (June/July sent style, despite `email_template.md` demanding captions); meaningful alt text instead. Narrow images capped at native width (July's 322px IQ Boost panel), not stretched to 600.
+- **Feature order July:** Workflows for Leads → Outlook Calendar add-in → IQ Boost Email Assist (biggest core capability first, Outlook features together). Same order both assets.
+- **Reminder task rewritten (2026-07-28):** `~/.claude/scheduled-tasks/maximizer-release-reminder/SKILL.md` now also sends a reminder EMAIL to Lewis via Resend. Why: the July 17 run's push notification was suppressed (Claude Code was foregrounded, so the system treated Lewis as present) and the briefing sat in an unopened background session. May-era stale gotchas purged. Rejected: push-only reminders — delivery depends on app state.
+- Prior June decisions all stand: PDF export (never scrape Loop), images mapped by section position never raw index, edition normalization names, H2-only body / no in-body title / no TOC, HubSpot CDN image pipeline, branded email shell with `{{INTRO_SENTENCE}}`, broadcast from `marketing@maximizer.com`.
+
+## Open items & blockers
+- **July cycle done — nothing required.** Optionally monitor broadcast `52cda340-aac7-4f7f-823b-4239f8db3ae1` in Resend (click tracking still off until tracking DNS fixed).
+- **`maximizer.com` Resend domain still `partially_failed`** — sending works (DKIM+SPF verified); only optional tracking records fail (`email` CNAME → `links1.resend-dns.com` + a CAA). IT to re-add if open/click analytics wanted.
+- **Reminder task is local-only:** fires on the 17th ~9am Vancouver only if Claude Code is open (else on next launch). SKILL.md email fallback makes late fires loud, but a closed Mac still delays it.
+
+## Next steps (in order)
+1. **Next cycle (M8):** reminder fires Aug 17. Run: export the M8 Loop page to PDF → `python3 resources/loop_pdf_extract.py "<pdf>" output/2026-08-release/` → follow the workflow. Remember the new title convention (`Maximizer Cloud – August 2026.8`) and the pre-broadcast `[DRAFT]` test send to Lewis.
+2. (Optional) Have IT re-add the Resend tracking CNAME + CAA to enable open/click tracking.
+
+## Tool knowledge & gotchas
+- **July Zendesk article `47706018096653`** — PUBLISHED (Lewis retitled + published it manually via UI). Title `Maximizer Cloud – July 2026.7`. Canonical URL: `https://support.maximizer.com/hc/en-us/articles/47706018096653-Maximizer-Cloud-July-2026-7`. Retitling changes the URL slug, but old slugs redirect by article ID, so pre-retitle links keep working.
+- **July broadcast id `52cda340-aac7-4f7f-823b-4239f8db3ae1`** (Release Notes audience, sent 2026-07-28). Test email id `6aaeb12c-550a-4a9e-95a4-ca0ac83cc129`.
+- **M7 filter result:** 3 of 5 table rows `Release Notes? = Yes` (Workflows for Leads; Maximizer Add-in in Outlook Calendar; IQ Boost Email Assist — the two M6 deferrals landed). Excluded: "Rewrite the task dialog" (feature-flagged, MadMax only), "Read.ai Integration". No Improvements/Fixes in M7. 6 images: 01–04 → Workflows for Leads, 05 → Outlook Calendar, 06 → Email Assist.
+- **Resend API + Python urllib = Cloudflare 1010 blocked.** Use `curl` with a browser `User-Agent`. Key in `~/.zshrc` (line 9), sending-scoped (`GET /domains` 403 is normal). Keep it out of chat.
+- **Zendesk:** subdomain `maximizer8634`; auth `ZENDESK_EMAIL` (`oulamurad@maximizer.com`) / `token:ZENDESK_API_TOKEN` from `~/.zshrc`. Create draft: `POST /api/v2/help_center/en-us/sections/23951413801741/articles.json` with `permission_group_id: 16069197925005` + `draft:true`. **Publish flag lives on the TRANSLATION**: `PUT /articles/{id}/translations/en-us.json {"translation":{"draft":false}}`.
+- **Published Zendesk articles 403 to public curl** (edge bot-protection) — not a visibility problem; verify via authenticated API GET instead, never gate a send on a public curl check.
+- **HubSpot:** portal `193809`, key `HUBSPOT_SERVICE_KEY` in `~/.zshrc` (Files scope, worked 2026-07-28). `resources/hubspot_upload.py` uploads `images/raw/` → writes `hubspot_urls.json`. CDN pattern `https://193809.fs1.hubspotusercontent-na1.net/hubfs/193809/release-notes/YYYY-MM/release-YYYY-MM-NN.png`.
+- **`resources/loop_pdf_extract.py`** (needs `pymupdf`): writes `loop_text.txt`, `images/raw/NN.png`, `_image_context.json`. Note: `_image_context.json` `preceding_text` can be just page-header chrome — confirm image↔feature mapping by viewing the images (Read tool renders PNGs).
+- **PDF reading in Claude Code:** `pdftoppm`/poppler is NOT installed on this Mac — the Read tool cannot render PDF pages. Use the extract script (or install poppler).
+- Old cloud routine `trig_01CnmNjhdL7thpPeahL9iCBQ` stays disabled. June one-off send to CI Newsletter audience (`082d3537-5ee3-4a6b-81c5-a732a738eae8`) is NOT standard — Release Notes audience only.
+
+## Session preferences
+- Lead the email's headline feature with what the capability is, not UI mechanics; editions in full published names; no visible image captions in the email; always test-send to Lewis and wait for his go before the broadcast.

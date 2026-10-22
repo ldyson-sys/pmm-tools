@@ -1,0 +1,121 @@
+KNOW THE STORY BEHIND YOUR BOOK
+Recorded demo, 4:00, eight scenes. Voice: Adam, first person.
+Lines in [square brackets] are actions and cues. Do not read them. Lines starting PASTE >>> are typed into Claude exactly as written.
+
+
+SCENE 1 — Hook: Tuesday, the Camerons at two (0:00 to 0:20)
+
+[Maximizer Address Book, contact list already open. Scroll slowly down the households in one smooth pass. Do not dart.]
+
+It is Tuesday. I have the Camerons at two. Peter and Mary. Good clients, fifteen years.
+
+I have not sat down with them since the spring, and I could not tell you off the top of my head what has changed for them.
+
+[Beat. Let the scroll run.]
+
+Seventy-five households. This is the book.
+
+
+SCENE 2 — The money (0:20 to 0:40)
+
+[Click through to the Investments dashboard. Let it load. Rest the cursor on the total AUM figure for two seconds.]
+
+And this is the money. A hundred million, give or take, across all of them.
+
+Every account, every position. It comes in from the dealer. I do not type any of it, which is the only reason it is right.
+
+
+SCENE 3 — One household (0:40 to 1:05)
+
+[Click Peter and Mary Cameron Family. Click the Investments tab. Rest the cursor on the inline AI summary at the top for two seconds.]
+
+Here they are. Four accounts, just over three million.
+
+And this line at the top is the part I would normally spend twenty minutes rebuilding from old notes.
+
+
+SCENE 4 — It read the record so I did not have to (1:05 to 1:30)
+
+[Click Learn more. IQ Boost opens. Request the household summary. Let it render fully. Hold five seconds, cursor still.]
+
+Who they are. How the money is arranged. What changed since I last saw them. What I should raise at two o'clock.
+
+[Beat.]
+
+That took nothing. It read the record. I did not have to.
+
+
+SCENE 5 — The pivot (1:30 to 1:45)
+
+[Stay on IQ Boost for the first line.]
+
+That is one family. There are seventy-four more, and the honest truth is I only ever look at the ones with a meeting this week.
+
+[Cmd-Tab to Claude desktop. Fresh chat inside the demo Project. Pause one second on the empty chat.]
+
+So we gave Claude the whole book. Every household, every account, every conversation. And it can write back into it.
+
+
+SCENE 6 — The book answers back (1:45 to 2:20)
+
+PASTE >>> Audit my book. Where is client cash sitting idle, and which of my most valuable households have I gone quiet on when something is coming up for them? Rank both by dollar value.
+
+[Send. Two seconds of silence. Do not move the mouse during the wait.]
+
+It is reading every household, every account, every logged call.
+
+[Wait until the answer has fully rendered. If an artifact opens, hold five seconds on it. If it is plain text, hold on the text.]
+
+Four households with cash doing nothing. One point six million between them. And three of my best clients I have not spoken to in over three months, each with something coming up.
+
+[Beat.]
+
+The Camerons are top of both lists. Nobody was careless. It just was not visible.
+
+[Collapse the tool-call chips.]
+
+
+SCENE 7 — It lands where the work is (2:20 to 2:45)
+
+A list is not work. So: book the calls.
+
+PASTE >>> Create a task for each of those three households, due Friday, titled "Call re idle cash and upcoming milestone", and put a one-line reason in each.
+
+[Confirmation lands. Cmd-Tab to Maximizer. Cameron household is already open. Scroll to the task. Rest the cursor on the reason line for three seconds.]
+
+And there it is. In the record, with the reason, where a task actually gets done.
+
+
+SCENE 8 — The clock, then close (2:45 to 4:00)
+
+[Cmd-Tab back to Claude.]
+
+Some things in this business run on a clock, and the clock does not send reminders.
+
+PASTE >>> How many of my clients turn 71 in the next 24 months, and how much RRSP money will have to convert to a RRIF?
+
+[Send. Hold on the answer four seconds.]
+
+Four clients, three households, about two and a half million in RRSPs that have to convert. I would have found that one household at a time. If I found it.
+
+[Cmd-Tab to Maximizer. Cameron household, task visible, family in view. Park the cursor. No movement for the rest of the scene.]
+
+It is ten to two. I know the Camerons' story. Three calls are booked. And I have a number for next year that I did not have this morning.
+
+[Beat.]
+
+None of that worked because the model is clever. It worked because the book was structured well enough to be asked a question.
+
+[End card: Forest Green ground, white headline, lime rule. Headline: Know the story behind your book.]
+
+Maximizer. Know the story behind your book.
+
+
+BEFORE YOU RECORD
+- Run the audit prompt first. It must return exactly Cameron, Hartfield and Vincent on the gone-quiet list. If not, fix the data, do not record.
+- Confirm the turning-71 prompt returns four clients across three households. If it returns zero, drop the first half of Scene 8.
+- Fresh Claude chat in the demo Project for every take. Capture at 1920 by 1080, light theme, Claude zoomed two steps up.
+- Between takes: delete the three tasks, re-run the coverage-decay script, re-check the audit prompt.
+
+TWO-MINUTE CUT
+Drop Scene 2, the inline-summary hold in Scene 3, and the first half of Scene 8. Keep Scene 5 intact.

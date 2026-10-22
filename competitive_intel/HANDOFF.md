@@ -1,6 +1,6 @@
 # Competitive Intelligence System — Handoff Doc
 **Last updated:** 2026-10-02
-**Repo:** https://github.com/dysonmaximizer-sys/claude
+**Repo:** https://github.com/ldyson-sys/pmm-tools
 **Project path:** `/Users/lewisdyson/Claude Code/competitive_intel/`
 
 ---

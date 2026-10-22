@@ -189,6 +189,32 @@ Leave one blank line between feature sections.
 
 ## SCREENSHOT & IMAGE INSTRUCTIONS
 
+### Image sizing (mandatory)
+
+Never set a content image to a bare `width:100%`. Measure every screenshot first
+(`sips -g pixelWidth -g pixelHeight <file>`) and give it an explicit pixel width:
+
+`W = min(nativeWidth, cap)`:
+
+| Shape | Test | `cap` |
+|---|---|---|
+| Landscape / full-app | `width >= height` | `600` |
+| **Portrait** (mobile screenshots) | `height > width` | `340` |
+
+A portrait phone capture stretched to the full 600px column renders ~1,300px tall
+and swamps the email; at 340 it is about 736px. The `min()` also means a small
+asset keeps its native size — a 322px side panel stays 322, never upscaled to 600.
+
+Write the width in **both** places — Outlook on Windows ignores `max-width`:
+
+```html
+<img src="{CDN URL}" alt="{description}" width="286" style="width:286px;max-width:100%;height:auto;">
+```
+
+Centering comes from the containing `<td align="center">`; `margin:auto` does not
+work in Outlook.
+
+
 For every feature, add ONE descriptive caption line after the Why it matters section.
 
 **Caption rules:**

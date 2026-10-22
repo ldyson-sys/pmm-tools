@@ -137,6 +137,54 @@ python3 "resources/hubspot_upload.py" "output/{{YYYY-MM}}-release/images/raw/"
 
 ---
 
+## Step 3b — Compute Display Widths (portrait / narrow images)
+
+Loop screenshots arrive at wildly different shapes: wide full-app captures, narrow side panels, and **portrait mobile screenshots**. Stretching all of them to the full content column (`width:100%`) blows a tall phone screenshot up to 600px wide and roughly 1,300px tall, so the reader scrolls past a wall of one screenshot. **Never blanket `width:100%`.** Measure every image first and give portrait and narrow images a fixed pixel width.
+
+Measure the raw files (macOS built-in, no install needed):
+
+```bash
+for f in "output/{{YYYY-MM}}-release/images/raw/"*.png; do
+  echo "$f $(sips -g pixelWidth -g pixelHeight "$f" | awk '/pixel/{printf "%s ", $2}')"
+done
+```
+
+Then set `{W}`, the display width in pixels, as **`W = min(nativeWidth, cap)`**:
+
+| Shape | Test (native dimensions) | `cap` — email | `cap` — article |
+|---|---|---|---|
+| **Landscape / full-app** | `width >= height` | 600 | 650 |
+| **Portrait** (incl. mobile screenshots) | `height > width` | **340** | **400** |
+
+Two rules do the work, and both are hard:
+
+- **Portrait images are capped narrow.** A 1170 × 2532 phone capture lands at `W = 340` (about 736px tall) instead of 600 × 1298. Tall content stays a column the reader can take in, not a full-width wall.
+- **Never upscale.** `min()` with the native width means a small asset keeps its own size. July's 322 × 790 IQ Boost side panel stays at **322**, not stretched to 600 and not shrunk either — an upscaled 322px panel is visibly soft on every screen and worse on retina.
+
+Round `{W}` down to a whole pixel. Landscape captures are almost always wider than the column, so they simply take it.
+
+Write the resulting width into **both** the HTML `width` attribute and the inline style:
+
+```html
+<img src="{CDN URL}" alt="{description}" width="340" style="width:340px;max-width:100%;height:auto;">
+```
+
+Both are required. Outlook on Windows renders through the Word engine, which **ignores `max-width` entirely** — without the `width` attribute a portrait screenshot renders at full native size there and destroys the layout. The `max-width:100%` keeps it inside the column on narrow mobile viewports.
+
+Centering is handled by the containing cell (`<td align="center">` in the `[C]` image block of `resources/email_template.html`) — do not add `margin:auto`, which Outlook also ignores.
+
+Record the computed widths alongside the URLs so Step 7c can verify them.
+
+Worked example — the July (M7) set, for reference:
+
+| Image | Native | Shape | `W` (email) |
+|---|---|---|---|
+| 01–04 | 1920 × ~940 | landscape | 600 |
+| 05 | 2702 × 1504 | landscape | 600 |
+| 06 | 322 × 790 | portrait, narrow | 322 (native — below the 340 cap) |
+
+---
+
 ## Step 3 — Generate Output Assets
 
 Using the filtered data, generate two assets following the rules below.
@@ -150,7 +198,8 @@ Follow the template in `resources/release_notes_template.md` exactly.
 - Write in active voice, benefits-first, professional and concise
 - Never repeat the same phrasing across features
 - Suggest a clear, consistent title for every feature
-- **Order features by customer impact, not by Loop order** — lead with the biggest/highest-impact features within `New Features`, then the rest; keep `Improvements` after `New Features`. Use the **same order in both the Zendesk article and the email** so they stay consistent. When impact is unclear, ask the operator which features are the headline items.
+- **Order features by customer impact, not by Loop order** — lead with the biggest/highest-impact features, then the rest. Use the **same order in both the Zendesk article and the email** so they stay consistent. When impact is unclear, ask the operator which features are the headline items. `Improvements` after `New Features` is the **default** section order, not an absolute (see the availability rule below).
+- **Narrow availability is a NEGATIVE ordering factor (2026-09-01, Lewis-directed).** Weigh how much of the audience can actually use each feature. A feature restricted to one edition, one data provider, or a single integration partner ranks **below** a broadly available one, even when it is the larger capability. This outranks the New-Features-first default: when the only new feature is narrowly available, the `Improvements` section leads and the `New Features` section goes last. Most readers should meet the things they can use first, and a reader who cannot use the headline item reads it as noise. Precedent: M8's Investments Sync Report (iA Private Wealth and Investia only) was placed at the bottom of both assets, putting `Improvements` ahead of `New Features` in the article. Availability limits come from the table's Notes column and the body's prerequisites, not from the Edition column alone — an `All Editions` feature gated to one integration partner is still narrow.
 - Normalize Edition names to the published convention (see template formatting rule): `FSE` → `Financial Services Edition`, `FSE+` → `Financial Services Edition +`, `Base` → `Base Edition`, `Sales Leader` → `Sales Leader Edition`, `All` → `All Editions`; keep `Business+` as-is; join multiple editions with a comma (e.g. `Financial Services Edition +, Business+`)
 - Do NOT generate a table of contents. Zendesk's Help Center theme auto-generates its own TOC from the article headings on publish; an in-body TOC creates a duplicate on the live page
 - Heading structure: use Heading 2 (`##`) for `Summary`, `New Features`, `Improvements`, and each feature/improvement name. Do not use Heading 1 in the body (reserved for the article title)
@@ -163,10 +212,11 @@ Follow the template in `resources/release_notes_template.md` exactly.
 **Images:**
 - Use the HubSpot CDN URLs from `output/{{YYYY-MM}}-release/hubspot_urls.json` (produced in Step 3a). Do NOT use `[IMAGE: ...]` placeholders, Zendesk attachments, or any other source.
 - Map each image to the feature whose section it sits under — **by position, not by raw index**. Use `images/raw/_image_context.json` (page + vertical position per image) together with `loop_text.txt` to determine which feature heading each image falls under. Do NOT assume image `NN` belongs to feature `NN`: excluded features (or features with zero/multiple images) shift the alignment. Confirm by matching the image's caption text in `loop_text.txt`.
-- Embed each image inline beneath the relevant section as an HTML tag with a constrained width, so it stays proportionate to the body text (this replaces manual resizing):
-  `<img src="{CDN URL}" alt="{short description of what is shown}" style="max-width:650px;width:100%;height:auto;">`
-- Do NOT precede images with a `Screenshots` label/heading or a `Screenshot:` caption — no label, no caption prefix.
-- The 650px max-width keeps inline images readable and aligned to the content column — do not insert full-resolution crops that span multiple screens.
+- Embed each image inline beneath the relevant section as an HTML tag with a constrained width, so it stays proportionate to the body text (this replaces manual resizing). **Size it by orientation — see Step 3b — never blanket `width:100%`.**
+  - Landscape / full-app (native width >= native height): `<img src="{CDN URL}" alt="{short description}" style="max-width:650px;width:100%;height:auto;">`
+  - Portrait (native height > native width) or narrow (native width < 650): `<img src="{CDN URL}" alt="{short description}" width="{W}" style="width:{W}px;max-width:100%;height:auto;">` where `{W}` is `min(nativeWidth, 400)` for portrait and `nativeWidth` for a narrow landscape asset, per Step 3b.
+- Do NOT precede images with a `Screenshots` label/heading or a `Screenshot:` caption prefix. Do add ONE plain-text caption line directly BELOW each image, describing what it shows or which step it illustrates (plain text, not bold, no colon at the end, no filename, no "Screenshot of"). Captions are required in BOTH the article and the email as of 2026-08-31 — the June/July alt-text-only email convention is retired.
+- The 650px max-width keeps landscape images readable and aligned to the content column — do not insert full-resolution crops that span multiple screens.
 - If no image maps to a given feature, omit the image for that feature.
 
 ---
@@ -217,7 +267,7 @@ Why it matters:
 [1–3 sentences on workflow impact and practical benefit. Mention compliance,
 time savings, clarity, or accuracy where relevant. No new technical detail.]
 
-<img src="{HubSpot CDN URL for this feature from hubspot_urls.json}" alt="{caption}" style="max-width:600px;width:100%;height:auto;">
+<img src="{HubSpot CDN URL for this feature from hubspot_urls.json}" alt="{caption}" width="{W from Step 3b}" style="width:{W}px;max-width:100%;height:auto;">
 [Image caption — plain text, descriptive, no colon at end, no filename, no "Screenshot of"]
 ```
 
@@ -228,13 +278,14 @@ time savings, clarity, or accuracy where relevant. No new technical detail.]
 
 **Image rules:**
 - Source every image from `output/{{YYYY-MM}}-release/hubspot_urls.json` (Step 3a) — the same CDN URLs used in the Zendesk article. No Zendesk attachments, no markers, no placeholders.
-- Embed inline as `<img src="{CDN URL}" alt="..." style="max-width:600px;width:100%;height:auto;">`, associated to features by DOM order (`01.png`, `02.png`, …) exactly as in Asset 1.
+- Embed inline with the width Step 3b computed for that image — **never blanket `width:100%`**. Landscape / full-app: `<img src="{CDN URL}" alt="..." width="600" style="width:600px;max-width:100%;height:auto;">`. Portrait / narrow: same tag with `{W}` from Step 3b in place of `600`. Map images to features **by section position exactly as in Asset 1** — not by raw file index.
 - One caption line directly below each image: plain text, not bold, describes what is visible (e.g., `Accounts module showing grid and Kanban toggle buttons`), no colon at the end, no filename, no "Screenshot of".
 - Multiple images for one feature: each `<img>` + caption on its own line, blank line between each.
 
 **Consistency rules:**
 - Every feature must include both `What's new` and `Why it matters`
 - Every feature must include at least one screenshot caption
+- Every image carries an explicit pixel width from Step 3b (`width` attribute + `width:{W}px` style) — no bare `width:100%`, no upscaling past native width
 - Section labels (`What's new:`, `Why it matters:`) must be bold
 - No summary paragraph unless explicitly requested
 - No emojis, no exclamation marks
@@ -371,6 +422,7 @@ Images are already embedded as HubSpot CDN `<img>` URLs when `email_draft.html` 
 
 - Open `email_draft.html` and confirm each feature's image renders from its `https://...hubspotusercontent-na1.net/...` URL.
 - If an image is missing or broken, check `hubspot_urls.json` for an empty value (a failed Step 3a upload), fix the upload, and regenerate the email.
+- **Check the widths.** Every `<img>` must carry a `width` attribute AND a matching `width:{W}px` in its style, with `{W}` equal to the Step 3b value for that image. Fail the check if any content image uses `width:100%` without a pixel width, if a portrait image exceeds the 340px cap, or if `{W}` exceeds the image's native width (upscaling). The `[DRAFT]` test send in Step 7d is the last chance to catch an oversized screenshot — open it on a phone as well as desktop.
 
 > The legacy `resources/screenshot_inject.py` (Zendesk-attachment injection) is superseded by the HubSpot pipeline and is no longer called. The file is left in place for history only.
 
@@ -382,6 +434,22 @@ Images are already embedded as HubSpot CDN `<img>` URLs when `email_draft.html` 
 - Use the subject line from `email_subject.txt`
 
 **Test send first (standing step since 2026-07, required):** before creating the broadcast, email the operator a copy of the final HTML via the standard `/emails` endpoint — from `marketing@maximizer.com` to `lewisdyson@maximizer.com`, subject prefixed `[DRAFT] `. Wait for the operator's explicit approval before proceeding to the broadcast.
+
+**MANDATORY duplicate-send preflight (added 2026-09-01 after a 3x incident).** `POST /broadcasts` is not idempotent: every call creates a NEW broadcast, and every `/send` mails the whole audience again. Re-running the send command because you did not see a clear success line will silently mail your customers twice. Before creating a broadcast, list what already went out and abort if this subject is present:
+
+```bash
+curl -s -A "Mozilla/5.0" "https://api.resend.com/broadcasts" \
+  -H "Authorization: Bearer $RESEND_API_KEY" \
+| python3 -c "
+import json,sys
+subj='<the exact subject from email_subject.txt>'
+rows=json.load(sys.stdin).get('data',[])
+hits=[r for r in rows if r.get('status')=='sent']
+print('ABORT - already sent' if any(subj in str(r.get('subject','')) for r in hits) else 'clear to send')
+"
+```
+
+The list endpoint returns `subject: None` in summary form, so fetch `GET /broadcasts/{id}` for same-day ids if the subject is needed. After sending, record the broadcast id in `release_payload.json` **immediately**, and treat a populated `resend_broadcast_id` as a hard stop on any further send for that cycle.
 
 Resend sends to a contact list via the **Broadcasts** API (two-step: create then send):
 

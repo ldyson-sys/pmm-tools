@@ -24,7 +24,7 @@ These rules override any default formatting behaviour. Follow them exactly on ev
 12. **Body headings use Heading 2 only.** Use Heading 2 (`##`) for the section headers `Summary`, `New Features`, `Improvements`, and for each individual feature/improvement name. Do not use Heading 1 anywhere in the body — H1 is reserved for the article title (set in the Title field). Note: sections and feature names sit at the same level, so the auto-TOC is a flat list, not nested.
 13. **No article title in the body.** Do NOT start the body with an `# Maximizer Cloud – ...` title. The release title is set in the Zendesk article **Title** field (see naming convention below); a body title duplicates it and adds a stray top-level entry to the TOC. The body's first heading is `# Summary`.
 14. **Edition and Area on separate rows.** Put `Edition: ...` and `Area: ...` on their own lines with a blank line between them so they render as two separate rows. A single line break between them collapses into one combined string in HTML (`Edition: X Area: Y`).
-15. **No "Screenshots" label before images.** Do NOT write a `Screenshots` heading/label or a `Screenshot:` caption prefix before visual content. Place images inline beneath the relevant section with no label or caption prefix.
+15. **Caption every image; no "Screenshots" label.** Place images inline beneath the relevant section, each followed by ONE plain-text caption line directly below it that says what the image shows or which step it illustrates. Captions are plain text, not bold, no colon at the end, no filename, no "Screenshot of" prefix. Do NOT write a `Screenshots` heading/label above the images, and do NOT prefix a caption with `Screenshot:`. (Captions restored 2026-08-31, Lewis-directed: they carry the how-it-works narrative. The earlier "no caption" rule and the June/July alt-text-only email convention are both retired.)
 16. **Image sizing (manual, during content prep).** Resize each image so it is proportionate to the body text — roughly the article content-column width (≈650px max), aspect ratio preserved. Do not insert excessively zoomed-in crops or images that span multiple screens inline.
 17. **Article Title field naming convention.** The Zendesk Title field must read `Maximizer Cloud – {{Month}} {{Year}}.{{Month number}}` — e.g. `Maximizer Cloud – July 2026.7`. (New convention from 2026-07, Lewis-directed. The old `Maximizer Cloud – June 2026 (2026 M6)` style is retired; pre-July 2026 articles keep their existing titles.)
 18. **Edition naming convention.** The Loop page uses shorthand; the published article uses full names. Convert: `FSE` → `Financial Services Edition`, `FSE+` → `Financial Services Edition +`, `Base` → `Base Edition`, `Sales Leader` → `Sales Leader Edition`, `All` → `All Editions`. Keep `Business+` exactly as written. Join multiple editions with a comma and space, e.g. `Financial Services Edition +, Business+`. (Area names — `Web` / `Mobile` / `Outlook` — are used as-is.)
@@ -42,6 +42,8 @@ Release Date: {{Month DD, YYYY}}
 {{A concise 2–3 sentence summary covering the main value of the release, the problem it solves, and the overarching benefit to advisors, admins, or sales teams.}}
 
 ## New Features
+
+<!-- Section order is the DEFAULT, not fixed. If every new feature is narrowly available (one edition, one data provider, one integration partner), put the Improvements section FIRST and New Features last - see the narrow-availability ordering rule in the workflow spec. -->
 
 ## {{Feature Name}}
 
@@ -147,6 +149,6 @@ If you need assistance, contact [support@maximizer.com](mailto:support@maximizer
 - Do not bold Release Date
 - Do not use emojis in headings
 - Do not include empty optional sections
-- No "Screenshots" label or caption before images — place visual content inline with no label
+- No "Screenshots" label above images, but every image carries one plain-text caption line directly beneath it (see formatting rule 15)
 - Resize images to be proportionate to body text (≈650px max width, aspect ratio preserved); no excessively zoomed-in crops or full-screen-spanning images
 - GIFs are preferred over static screenshots where interaction is being demonstrated

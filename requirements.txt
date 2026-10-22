@@ -1,0 +1,3 @@
+# Python dependencies for the Maximizer release automation workflow
+markdown>=3.9      # Step 4/7a: convert the Zendesk article Markdown to HTML
+pymupdf>=1.26     # Step 1: extract text + full-res images from the Loop PDF export
